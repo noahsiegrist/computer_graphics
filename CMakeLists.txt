@@ -11,5 +11,11 @@ add_executable(01_clion src/main.cpp
         src/Sphere.cpp
         src/Sphere.h
         src/Color.h
-        src/Color.cpp)
+        src/Color.cpp
+        src/ScreenPainter.cpp
+        src/ScreenPainter.h
+        src/Vec3.cpp
+        src/Vec3.h)
+
 target_link_libraries(01_clion PRIVATE SDL2::SDL2)
+

@@ -1,64 +1,99 @@
-#include <iostream>
-#include <SDL2/SDL.h>
 #include <math.h>
+#include "ScreenPainter.h"
+#include "CornellBox.h"
+#include <iostream>
 
 const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 600;
+const int SCREEN_HEIGHT = 800;
 
-void SetPixel(SDL_Surface* surface, int x, int y, Uint32 pixel) {
-    int bpp = surface->format->BytesPerPixel;
-    Uint8* p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
-    *(Uint32 *)p = pixel;
+
+bool isClose(Vec3 a, Vec3 b) {
+    if(a.null) {
+        return b.null;
+    }
+    std::cout << "The difference is " << (a - b).length() << std::endl;
+    return (a - b).length() < 0.0001;
+}
+
+bool testIntersects() {
+    bool passed = true;
+    Sphere sphere(Vec3(0, 0, 0), 1.0f, BLACK);  // A sphere centered at origin with radius 1
+
+    // Test case 1: Ray intersects sphere at two points
+    Vec3 origin1(0, 0, -2);
+    Vec3 to1(0, 0, 2);
+    Vec3 expectedIntersection1(0, 0, -1);
+    if (isClose(sphere.intersect(origin1, to1), expectedIntersection1)) {
+        std::cout << "Test case 1 passed!" << std::endl;
+    } else {
+        std::cout << "Test case 1 failed!" << std::endl;
+        passed = false;
+    }
+
+    // Test case 2: Ray touches the sphere at one point
+    Vec3 origin2(0, 0, -4);
+    Vec3 to2(1, 0, 0);
+    Vec3 expectedIntersection2(0.88235294117647067, 0, -0.47058823529411731);
+    if (isClose(sphere.intersect(origin2, to2), expectedIntersection2)) {
+        std::cout << "Test case 2 passed!" << std::endl;
+    } else {
+        std::cout << "Test case 2 failed!" << std::endl;
+        passed = false;
+    }
+
+    // Test case 3: Ray misses the sphere
+    Vec3 origin3(0, 2, 0);
+    Vec3 to3(0, 3, 0);
+    Vec3 expectedIntersection3 = {};  // No intersection
+    if (isClose(sphere.intersect(origin3, to3), expectedIntersection3)) {
+        std::cout << "Test case 3 passed!" << std::endl;
+    } else {
+        std::cout << "Test case 3 failed!" << std::endl;
+        passed = false;
+    }
+
+    // Test case 4: ray passes through the sphere
+    Vec3 origin4(0, 0, -4);
+    Vec3 to4(0, 0, 1);
+    Vec3 expectedIntersection4(0, 0, -1);
+    if (isClose(sphere.intersect(origin4, to4), expectedIntersection4)) {
+        std::cout << "Test case 4 passed!" << std::endl;
+    } else {
+        std::cout << "Test case 4 failed!" << std::endl;
+        passed = false;
+    }
+
 
 }
 
-int main(int argc, char* argv[]) {
-    SDL_Window* window;
-    SDL_Renderer* renderer;
-    SDL_Texture* texture;
+int main() {
 
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        fprintf(stderr, "Error initializing sdl2: %s\n", SDL_GetError());
-        return 1;
-    }
 
-    window = SDL_CreateWindow("Gradient Nebula", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_WIDTH, SDL_WINDOW_SHOWN);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    ScreenPainter painter(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    SDL_Surface* gradient = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0, 0, 0, 0);
+    /**
+     * This is the code that draws the cornel box.
+     */
+    CornellBox cornellBox(36, {0, 0, -4}, {0, 0, 6});
 
+    cornellBox.display(painter);
+
+
+    /**
+     * This is the code that draws a gradient.
+     *
     for (int x = 0; x < SCREEN_WIDTH; x++) {
-        float factor = (float)x / SCREEN_WIDTH;
-        Uint8 r = 255 * pow(factor, 1/2.2);
-        Uint8 g = 255 * pow(1 - factor, 1/2.2);
-        Uint32 color = SDL_MapRGB(gradient->format, r, g, 0);
-
+        double factor = (double)x / SCREEN_WIDTH;
+        double r = pow(factor, 1/2.2);
+        double g = pow(1.f - factor, 1/2.2);
         for (int y = 0; y < SCREEN_HEIGHT; y++) {
-            SetPixel(gradient, x, y, color);
+            painter.setPixel(x, y, r, g, 0);
         }
     }
+     */
+    painter.display();
 
-    // Convert the surface to texture
-    texture = SDL_CreateTextureFromSurface(renderer, gradient);
-    SDL_FreeSurface(gradient);
-
-    int quit = 0;
-    SDL_Event e;
-
-    while (!quit) {
-        while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT) {
-                quit = 1;
-            }
-        }
-
-        SDL_RenderCopy(renderer, texture, NULL, NULL);
-        SDL_RenderPresent(renderer);
-    }
-
-    SDL_DestroyTexture(texture);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    painter.wait();
+    painter.clear();
     return 0;
 }
