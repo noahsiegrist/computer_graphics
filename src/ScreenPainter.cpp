@@ -23,6 +23,15 @@ ScreenPainter::ScreenPainter(int width, int height)
 }
 
 void ScreenPainter::setPixel(int x, int y, double r, double g, double b) {
+    if(r >= 1) r = 1;
+    if(g >= 1) g = 1;
+    if(b >= 1) b = 1;
+    if(r < 0) b = 0;
+    if(g < 0) b = 0;
+    if(b < 0) b = 0;
+    r = pow(r, 1/2.2);
+    g = pow(g, 1/2.2);
+    b = pow(b, 1/2.2);
     Uint32 pixel = SDL_MapRGB(m_surface->format, (Uint8) (r*255), (Uint8) (g*255), (Uint8) (b*255));
     int bpp = m_surface->format->BytesPerPixel;
     Uint8* p = (Uint8 *)m_surface->pixels + y * m_surface->pitch + x * bpp;

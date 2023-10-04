@@ -13,4 +13,7 @@ public:
 
     Vec3 intersect(const Vec3& origin, const Vec3& to) const;
 
+    bool hasEmission() const {
+        return !emission.equals(BLACK);
+    }
 };

@@ -3,8 +3,8 @@
 #include "CornellBox.h"
 #include <iostream>
 
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 800;
+const int SCREEN_WIDTH = 100;
+const int SCREEN_HEIGHT = 100;
 
 
 bool isClose(Vec3 a, Vec3 b) {
@@ -74,7 +74,9 @@ int main() {
     /**
      * This is the code that draws the cornel box.
      */
+
     CornellBox cornellBox(36, {0, 0, -4}, {0, 0, 6});
+    //CornellBox cornellBox(110, {-0.9, -0.5, 0.9}, {0, 0, 0});
 
     cornellBox.display(painter);
 
@@ -84,13 +86,13 @@ int main() {
      *
     for (int x = 0; x < SCREEN_WIDTH; x++) {
         double factor = (double)x / SCREEN_WIDTH;
-        double r = pow(factor, 1/2.2);
-        double g = pow(1.f - factor, 1/2.2);
+        double r = factor;
+        double g = 1.f - factor;
         for (int y = 0; y < SCREEN_HEIGHT; y++) {
             painter.setPixel(x, y, r, g, 0);
         }
-    }
-     */
+    }*/
+
     painter.display();
 
     painter.wait();

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <cmath>
+#include <random>
 
 class Vec3 {
 public:
@@ -44,5 +45,7 @@ public:
                 vec[2] * other.vec[0] - vec[0] * other.vec[2],
                 vec[0] * other.vec[1] - vec[1] * other.vec[0]};
     }
+
+    static Vec3 random();
 };
 
