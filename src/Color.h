@@ -8,9 +8,9 @@ private:
     std::vector<double> color;
 public:
     Color (double r, double g, double b);
-    Color multiply(Color color) const;
+    Color multiply(const Color& color) const;
     Color multiply(const double factor) const;
-    Color add(Color color) const;
+    Color add(const Color& color) const;
     Color clip() const;
     double r() {return color[0];}
     double g() {return color[1];}

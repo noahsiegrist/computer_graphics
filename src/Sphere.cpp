@@ -11,8 +11,8 @@ Sphere::Sphere(const Vec3 &center, double radius, const Color &color, const Colo
 }
 
 Vec3 Sphere::intersect(const Vec3 &origin, const Vec3 &to) const {
-    Vec3 co = origin - center;
-    Vec3 ray = to.normalize();
+    const Vec3& co = origin - center;
+    const Vec3& ray = to.normalize();
 
     double a = 1.f; // ray.dot(ray);  // This will be 1 if ray is normalized, but let's keep it for clarity.
     double b = 2.0f * ray.dot(co);
