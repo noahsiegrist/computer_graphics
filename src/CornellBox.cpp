@@ -71,10 +71,10 @@ namespace {
 Color BRDF(Vec3 in, Vec3 out, Vec3 n, Color color) {
     //Vec3 d = in - (n * ((double) 2.f * in.dot(n)));
     if(in.normalize().dot(n.normalize()) > 0.000001) {
-        return color;
+        return color.multiply(10);
     }
 
-    return color;//.multiply(1.f/M_PIf);
+    return color.multiply(1.f/M_PIf);
 }
 
 double p = 0.2f;
@@ -120,7 +120,7 @@ void CornellBox::populateScene() {
     m_scene.push_back(Sphere({1001, 0, 0}, 1000, BLUE, BLACK));
     m_scene.push_back(Sphere({0, 0, 1001}, 1000, GREY, BLACK));
     m_scene.push_back(Sphere({0, -1001, 0}, 1000, GREY, BLACK));
-    m_scene.push_back(Sphere({0, 1001, 0}, 1000, WHITE, WHITE));
+    m_scene.push_back(Sphere({0, 1001, 0}, 1000, WHITE, WHITE.multiply(2)));
     m_scene.push_back(Sphere({-0.6, -0.7, -0.6}, 0.3, YELLOW, BLACK));
     m_scene.push_back(Sphere({0.3, -0.4, 0.3}, 0.6, LIGHTCYAN, BLACK));
 };
@@ -130,7 +130,7 @@ void CornellBox::display(ScreenPainter painter) const {
         for (int y = 0; y < painter.getScreenHeight(); y++) {
             Vec3 lookAtVector = lookAt(m_eye, m_lookAt, x, y, painter.getScreenWidth(), painter.getScreenHeight(), m_fov);
             Color accumulator = BLACK;
-            int max = 265;
+            int max = 32;
             for(int i = 0; i < max; i++) {
                 accumulator = accumulator.add(computeColor(m_eye, lookAtVector, m_scene));
             }
