@@ -47,5 +47,7 @@ public:
     }
 
     static Vec3 random();
+
+
 };
 

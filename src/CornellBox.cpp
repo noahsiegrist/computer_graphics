@@ -59,7 +59,7 @@ Color BRDF(const Vec3& in, const Vec3& out, const Vec3& n, const Color& color) {
     const Vec3& specularDirection = in - (n * (2 * in.dot(n)));
     float d = out.normalize().dot(specularDirection.normalize());
     if(d >= 0.99) {
-        return color.multiply(1.f/M_PIf).add(WHITE.multiply(10));
+        return color.multiply(1.f/M_PIf).add(WHITE.multiply(5));
     }
 
     return color.multiply(1.f/M_PIf);
@@ -68,8 +68,8 @@ Color BRDF(const Vec3& in, const Vec3& out, const Vec3& n, const Color& color) {
 constexpr float p = 0.2f;
 
 Color computeColor(const Vec3& origin, const Vec3& ray, const std::vector<Sphere>& scene, int depth = 0) {
-    std::pair<const Sphere*, float> hitPoint = findClosestHitPoint(origin, ray, scene);
-    if (hitPoint.second == -1) {
+    std::pair<const Sphere*, float> hitPoint = findClosestHitPoint(origin, ray.normalize(), scene);
+    if (hitPoint.second == MAXFLOAT) {
         return BLACK;
     }
 
@@ -79,6 +79,7 @@ Color computeColor(const Vec3& origin, const Vec3& ray, const std::vector<Sphere
     }
 
     const Vec3& in = (origin + ray * hitPoint.second);
+
     const Vec3& normal = (in-hitPoint.first->center).normalize();
 
     const Vec3& random = getRandomVectorCorrected(normal).normalize();
@@ -86,11 +87,14 @@ Color computeColor(const Vec3& origin, const Vec3& ray, const std::vector<Sphere
     constexpr float factor = 2.0f * M_PI / (1-p);
     const Vec3& correctedByOffset = in +normal*0.0001;
     const Color& computeColorRay = computeColor(correctedByOffset, random, scene, depth+1);
+
     const Color& sampleColor =
             computeColorRay
             .multiply(BRDF(ray, random, normal, hitPoint.first->color))
             .multiply(factor * cosO);
-    return hitPoint.first->emission.add(sampleColor);
+    const Color& emission = hitPoint.first->emission;
+
+    return emission.add(sampleColor);
 }
 
 
@@ -107,7 +111,7 @@ void CornellBox::populateScene() {
     m_scene.push_back(Sphere({1001, 0, 0}, 1000, BLUE, BLACK));
     m_scene.push_back(Sphere({0, 0, 1001}, 1000, GREY, BLACK));
     m_scene.push_back(Sphere({0, -1001, 0}, 1000, GREY, BLACK));
-    m_scene.push_back(Sphere({0, 1001, 0}, 1000, WHITE, WHITE.multiply(1)));
+    m_scene.push_back(Sphere({0, 1001, 0}, 1000, WHITE, WHITE.multiply(2)));
     m_scene.push_back(Sphere({-0.6, -0.7, -0.6}, 0.3, YELLOW, BLACK));
     m_scene.push_back(Sphere({0.3, -0.4, 0.3}, 0.6, LIGHTCYAN, BLACK));
 };
@@ -117,7 +121,7 @@ void CornellBox::populateScene() {
 void paintPixel(ScreenPainter &painter, int x, int y, const Vec3& origin, const Vec3& ray, const std::vector<Sphere>& scene) {
     const Vec3& lookAtVector = lookAt(origin, ray, x, y);
     Color accumulator = BLACK;
-    int max = 100;
+    int max = 4000;
     for(int i = 0; i < max; i++) {
         accumulator = accumulator.add(computeColor(origin, lookAtVector, scene));
     }
