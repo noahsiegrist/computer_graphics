@@ -14,7 +14,7 @@ public:
     ScreenPainter(int width, int height);
     int getScreenWidth() const;
     int getScreenHeight() const;
-    void setPixel(int x, int y, double r, double g, double b);
+    void setPixel(int x, int y, float r, float g, float b);
     void display();
     void wait() const;
     void clear();

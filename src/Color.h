@@ -5,16 +5,16 @@
 class Color
 {
 private:
-    std::vector<double> color;
+    std::vector<float> color;
 public:
-    Color (double r, double g, double b);
+    Color (float r, float g, float b);
     Color multiply(const Color& color) const;
-    Color multiply(const double factor) const;
+    Color multiply(const float factor) const;
     Color add(const Color& color) const;
     Color clip() const;
-    double r() {return color[0];}
-    double g() {return color[1];}
-    double b() {return color[2];}
+    float r() {return color[0];}
+    float g() {return color[1];}
+    float b() {return color[2];}
 
     bool equals(Color color) const {
         return this->color[0] == color.color[0] && this->color[1] == color.color[1] && this->color[2] == color.color[2];

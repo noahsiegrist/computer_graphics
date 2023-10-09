@@ -20,7 +20,7 @@ class CornellBox {
 public:
 
     CornellBox(const Vec3 &eye, const Vec3 &lookAt);
-    void display(ScreenPainter painter) const;
+    void display(ScreenPainter &painter) const;
 };
 
 

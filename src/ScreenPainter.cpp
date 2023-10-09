@@ -22,7 +22,7 @@ ScreenPainter::ScreenPainter(int width, int height)
     m_surface = SDL_CreateRGBSurface(0, m_screen_width, m_screen_height, 32, 0, 0, 0, 0);
 }
 
-void ScreenPainter::setPixel(int x, int y, double r, double g, double b) {
+void ScreenPainter::setPixel(int x, int y, float r, float g, float b) {
     if(r >= 1) r = 1;
     if(g >= 1) g = 1;
     if(b >= 1) b = 1;
