@@ -2,11 +2,12 @@
 #include "Vec3.h"
 
 
-Sphere::Sphere(const Vec3 &center, float radius, const Color &color, const Color &emission)
+Sphere::Sphere(const Vec3 &center, float radius, const Color &color, const Color &emission, bool specular)
 : center(center)
 , radius(radius)
 , color(color)
 , emission(emission)
+, specular(specular)
 {
 }
 
