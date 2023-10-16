@@ -59,7 +59,7 @@ bool testIntersects() {
         passed = false;
     }
 
-
+    return passed;
 }
 
 int main() {
@@ -78,18 +78,18 @@ int main() {
     cornellBox.display(painter);
 
 
-    /*
+/*
     for (int x = 0; x < SCREEN_WIDTH; x++) {
         for(int y = 0; y < SCREEN_HEIGHT; y++) {
 
-            float factor = sin(x/30.f) + sin( y/50.f)* sin( y/50.f);
-            float r = cos(factor);
-            float g = sin(factor);
-            float b = cos(factor);
+            float factor = (sin(x/10.f)+1.f)/2.f;
+            float r = factor;
+            float g = factor;
+            float b = factor;
             painter.setPixel(x, y, r, g, b);
         }
     }
-     */
+*/
 
 
     /**

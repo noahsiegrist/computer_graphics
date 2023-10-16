@@ -2,15 +2,6 @@
 #include "Vec3.h"
 
 
-Sphere::Sphere(const Vec3 &center, float radius, const Color &color, const Color &emission, bool specular)
-: center(center)
-, radius(radius)
-, color(color)
-, emission(emission)
-, specular(specular)
-{
-}
-
 float Sphere::intersect(const Vec3 &origin, const Vec3 &to) const {
     const Vec3& co = origin - center;
     const Vec3& ray = to.normalize();
@@ -36,3 +27,4 @@ float Sphere::intersect(const Vec3 &origin, const Vec3 &to) const {
 
     return -1;
 }
+

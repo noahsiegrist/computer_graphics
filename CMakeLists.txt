@@ -15,7 +15,13 @@ add_executable(01_clion src/main.cpp
         src/ScreenPainter.cpp
         src/ScreenPainter.h
         src/Vec3.cpp
-        src/Vec3.h)
+        src/Vec3.h
+        src/Texture.cpp
+        src/Texture.h
+)
+
+target_include_directories(01_clion PRIVATE includes)
+
 
 target_link_libraries(01_clion PRIVATE SDL2::SDL2)
 

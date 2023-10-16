@@ -20,12 +20,12 @@ std::pair<const Sphere*, float> findClosestHitPoint(const Vec3& origin, const Ve
     return std::make_pair(closestSphere, shortestDistance);
 }
 
-Vec3 lookAt(const Vec3& origin, const Vec3& ray, int x, int y) {
+Vec3 lookAt(const Vec3& origin, const Vec3& ray, float x, float y) {
     constexpr float aspectRatio = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
     constexpr float fovRadians = (float)FOV * M_PIf / 180.0f;
 
-    float _x = 2.0f * (float)x / (float)SCREEN_WIDTH - 1.f;
-    float _y = 2.0f * (float)y / (float)SCREEN_HEIGHT - 1.f;
+    float _x = 2.0f * x / (float)SCREEN_WIDTH - 1.f;
+    float _y = 2.0f * y / (float)SCREEN_HEIGHT - 1.f;
     constexpr float tan = std::tan(fovRadians / 2.0f);
     float cameraX = tan * _x;
     float cameraY = tan * _y / aspectRatio;
@@ -55,15 +55,15 @@ namespace {
     std::uniform_real_distribution<float> dis(0, 1.0);
 }
 
-Color BRDF(const Vec3& in, const Vec3& out, const Vec3& n, const Color& color, bool specular = false) {
-    if(specular) {
+Color BRDF(const Vec3& in, const Vec3& out, const Vec3& n, const Sphere* sphere) {
+    if(sphere->specular) {
         const Vec3 &specularDirection = in - (n * (2 * in.dot(n)));
         float d = out.normalize().dot(specularDirection.normalize());
         if (d >= 0.99) {
-            return color.multiply(1.f / M_PIf).add(WHITE.multiply(5));
+            return sphere->getColor(n).multiply(1.f / M_PIf).add(WHITE.multiply(10));
         }
     }
-    return color.multiply(1.f/M_PIf);
+    return sphere->getColor(n).multiply(1.f/M_PIf);
 }
 
 constexpr float p = 0.2f;
@@ -75,13 +75,12 @@ Color computeColor(const Vec3& origin, const Vec3& ray, const std::vector<Sphere
     }
 
     float random_p = dis(gen);
-    if (random_p < p) {
-        return hitPoint.first->emission;
-    }
-
     const Vec3& in = (origin + ray * hitPoint.second);
-
     const Vec3& normal = (in-hitPoint.first->center).normalize();
+
+    if (random_p < p) {
+        return hitPoint.first->getEmmission(normal);
+    }
 
     const Vec3& random = getRandomVectorCorrected(normal).normalize();
     const float cosO = random.dot(normal);
@@ -91,9 +90,9 @@ Color computeColor(const Vec3& origin, const Vec3& ray, const std::vector<Sphere
 
     const Color& sampleColor =
             computeColorRay
-            .multiply(BRDF(ray, random, normal, hitPoint.first->color,  hitPoint.first->specular))
+            .multiply(BRDF(ray, random, normal, hitPoint.first))
             .multiply(factor * cosO);
-    const Color& emission = hitPoint.first->emission;
+    const Color& emission = hitPoint.first->getEmmission(normal);
 
     return emission.add(sampleColor);
 }
@@ -112,23 +111,50 @@ void CornellBox::populateScene() {
     m_scene.push_back(Sphere({1001, 0, 0}, 1000, BLUE, BLACK));
     m_scene.push_back(Sphere({0, 0, 1001}, 1000, GREY, BLACK));
     m_scene.push_back(Sphere({0, -1001, 0}, 1000, GREY, BLACK));
-    m_scene.push_back(Sphere({0, 1001, 0}, 1000, WHITE, WHITE.multiply(2)));
-    m_scene.push_back(Sphere({-0.6, -0.7, -0.6}, 0.3, YELLOW, BLACK, true));
-    m_scene.push_back(Sphere({0.3, -0.4, 0.3}, 0.6, LIGHTCYAN, BLACK, true));
+    m_scene.push_back(Sphere({0, 1001, 0}, 1000, WHITE, WHITE.multiply(2), false, true, false));
+   // m_scene.push_back(Sphere({-0.6, -0.7, -2}, 0.2, WHITE, WHITE.multiply(10), false, false, false));
+    m_scene.push_back(Sphere({-0.6, -0.7, -0.6}, 0.3, YELLOW, BLACK, false, true));
+    m_scene.push_back(Sphere({0.3, -0.4, 0.3}, 0.6, LIGHTCYAN, BLACK, true, false, false));
 };
+
+template <std::size_t num_samples>
+constexpr std::array<float, num_samples> getGausianWeights(const float sigma) {
+    std::array<float, num_samples> weights{};
+    float weightSum = 0.0f;
+    for (int i = 0; i < num_samples; i++) {
+        float samplePos = (float(i) / (num_samples - 1)) * 2.0f - 1.0f;
+        weights[i] = exp(-samplePos * samplePos / (2.0f * sigma * sigma));
+        weightSum += weights[i];
+    }
+    for (int i = 0; i < num_samples; i++) {
+        weights[i] /= weightSum;
+    }
+    return weights;
+}
 
 #include <thread>
 
 void paintPixel(ScreenPainter &painter, int x, int y, const Vec3& origin, const Vec3& ray, const std::vector<Sphere>& scene) {
-    const Vec3& lookAtVector = lookAt(origin, ray, x, y);
-    Color accumulator = BLACK;
-    int max = 4000;
-    for(int i = 0; i < max; i++) {
-        accumulator = accumulator.add(computeColor(origin, lookAtVector, scene));
-    }
-    Color color = accumulator.multiply(1.f/(float)max);
+    const int num_samples = 50;
+    const float sigma = 0.5f;
 
-    painter.setPixel(x, y, color.r(), color.g(), color.b());
+    auto weights = getGausianWeights<num_samples>(sigma);
+
+    Color accumulator = BLACK;
+
+    for (int i = 0; i < num_samples; i++) {
+        for (int j = 0; j < num_samples; j++) {
+            float offsetX = (float(i) / (num_samples - 1)) - 0.5f;
+            float offsetY = (float(j) / (num_samples - 1)) - 0.5f;
+
+            const Vec3& offsetLookAtVector = lookAt(origin, ray, x + offsetX, y + offsetY);
+            Color sampleColor = computeColor(origin, offsetLookAtVector, scene);
+
+            accumulator = accumulator.add(sampleColor.multiply(weights[i] * weights[j]));
+        }
+    }
+
+    painter.setPixel(x, y, accumulator.r(), accumulator.g(), accumulator.b());
 }
 
 void CornellBox::display(ScreenPainter &painter) const {
@@ -142,7 +168,6 @@ void CornellBox::display(ScreenPainter &painter) const {
 
     for (int x = 0; x < painter.getScreenWidth(); x++) {
         for (int y = 0; y < painter.getScreenHeight(); y++) {
-            // If we've reached the batch size, wait for the first thread to finish
             if (threads.size() >= batchSize) {
                 threads.front().join();
                 threads.erase(threads.begin());
