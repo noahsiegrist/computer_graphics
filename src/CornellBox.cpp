@@ -74,6 +74,7 @@ Color computeColor(const Vec3& origin, const Vec3& ray, const std::vector<Sphere
         return BLACK;
     }
 
+
     float random_p = dis(gen);
     const Vec3& in = (origin + ray * hitPoint.second);
     const Vec3& normal = (in-hitPoint.first->center).normalize();
@@ -107,15 +108,38 @@ CornellBox::CornellBox(const Vec3 &eye, const Vec3 &lookAt)
 }
 
 void CornellBox::populateScene() {
-    m_scene.push_back(Sphere({-1001, 0, 0}, 1000, RED, BLACK));
+  /*  m_scene.push_back(Sphere({-1001, 0, 0}, 1000, RED, BLACK));
     m_scene.push_back(Sphere({1001, 0, 0}, 1000, BLUE, BLACK));
     m_scene.push_back(Sphere({0, 0, 1001}, 1000, GREY, BLACK));
     m_scene.push_back(Sphere({0, -1001, 0}, 1000, GREY, BLACK));
     m_scene.push_back(Sphere({0, 1001, 0}, 1000, WHITE, WHITE.multiply(2), false, true, false));
-   // m_scene.push_back(Sphere({-0.6, -0.7, -2}, 0.2, WHITE, WHITE.multiply(10), false, false, false));
     m_scene.push_back(Sphere({-0.6, -0.7, -0.6}, 0.3, YELLOW, BLACK, false, true));
     m_scene.push_back(Sphere({0.3, -0.4, 0.3}, 0.6, LIGHTCYAN, BLACK, true, false, false));
-};
+*/
+/*
+    m_scene.push_back(Sphere({-1007, 0, 10}, 900, WHITE, WHITE.multiply(2)));
+    m_scene.push_back(Sphere({-1, 0, 19}, 0.5, GREY, BLACK));
+    m_scene.push_back(Sphere({2, 0, 20}, 2, GREEN, BLACK, false, true));
+    m_scene.push_back(Sphere({105, 0, 20}, 100, GREEN, BLACK, true, true));
+  */
+
+    m_scene.push_back(Sphere({0, -1001, 0}, 1000, GREY, BLACK, false));
+    m_scene.push_back(Sphere({-1001, 0, 0}, 1000, GREY, BLACK, false));
+    m_scene.push_back(Sphere({0, 0, 1001}, 1000, GREY, BLACK, false));
+    m_scene.push_back(Sphere({1001, 0, 0}, 1000, GREY, BLACK, false));
+    //m_scene.push_back(Sphere({0, 2, 0}, 0.2, WHITE, WHITE.multiply(2)));
+
+    m_scene.push_back(Sphere({1, 1, 1}, 0.5, GREEN, BLACK));
+    m_scene.push_back(Sphere({0, -1, 2}, 0.5, LIGHTCYAN, BLACK));
+    m_scene.push_back(Sphere({0.3, -0.1, 1}, 0.5, LIGHTCYAN, BLACK));
+    m_scene.push_back(Sphere({-0.2, -0.3, 0}, 0.3, LIGHTCYAN, BLACK));
+    m_scene.push_back(Sphere({-1, -1, 1}, 0.5, GREEN, WHITE.multiply(3)));
+    m_scene.push_back(Sphere({0.7, -0.7, -1}, 0.1, YELLOW, WHITE.multiply(3)));
+    m_scene.push_back(Sphere({-0.5, -0.5, 0}, 0.5, YELLOW, BLACK));
+    m_scene.push_back(Sphere({0, 0, 0}, 0.5, YELLOW, BLACK));
+    m_scene.push_back(Sphere({-1, 1, 0}, 0.5, GREEN, BLACK));
+
+   };
 
 template <std::size_t num_samples>
 constexpr std::array<float, num_samples> getGausianWeights(const float sigma) {
@@ -136,7 +160,7 @@ constexpr std::array<float, num_samples> getGausianWeights(const float sigma) {
 
 void paintPixel(ScreenPainter &painter, int x, int y, const Vec3& origin, const Vec3& ray, const std::vector<Sphere>& scene) {
     const int num_samples = 50;
-    const float sigma = 0.5f;
+    const float sigma = 1.5f;
 
     auto weights = getGausianWeights<num_samples>(sigma);
 

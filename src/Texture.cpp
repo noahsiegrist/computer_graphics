@@ -20,9 +20,9 @@ Color getColorOn2D(float t, float s, const Texture& texture) {
 
         int location = (t_index * texture.m_width + s_index) * texture.m_channels;
         return Color{
-                texture.m_data[location] / 255.0f,
-                texture.m_data[location + 1] / 255.0f,
-                texture.m_data[location + 2] / 255.0f
+                pow(texture.m_data[location] / 255.0f, 2.2f),
+                pow(texture.m_data[location + 1] / 255.0f, 2.2f),
+                pow(texture.m_data[location + 2] / 255.0f, 2.2f)
         };
     }
 
