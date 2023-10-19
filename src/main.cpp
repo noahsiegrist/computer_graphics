@@ -72,7 +72,7 @@ int main() {
      */
 
 
-    CornellBox cornellBox({0, 0, -4}, {0, 0, 6});
+    CornellBox cornellBox({-0.9, -0.5, 0.9}, {0, 0, 0});
     //CornellBox cornellBox(110, {-0.9, -0.5, 0.9}, {0, 0, 0});
 
     cornellBox.display(painter);

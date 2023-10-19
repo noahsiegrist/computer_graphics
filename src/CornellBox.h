@@ -4,9 +4,9 @@
 #include "Sphere.h"
 #include "ScreenPainter.h"
 
-constexpr int SCREEN_WIDTH = 200;
-constexpr int SCREEN_HEIGHT = 200;
-constexpr int FOV = 36;
+constexpr int SCREEN_WIDTH = 800;
+constexpr int SCREEN_HEIGHT = 800;
+constexpr int FOV = 110;
 
 class CornellBox {
     Vec3 m_eye;
